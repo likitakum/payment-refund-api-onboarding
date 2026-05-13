@@ -1,0 +1,35 @@
+name: Postman API Onboarding
+
+on:
+  workflow_dispatch:
+    inputs:
+      project_name:
+        description: Service project name
+        required: true
+        default: payment-refund-api
+      spec_url:
+        description: Raw HTTPS URL for the OpenAPI spec
+        required: true
+        default: https://raw.githubusercontent.com/likitakum/payment-refund-api-onboarding/main/specs/payment-refund-api-openapi.yaml
+
+permissions:
+  actions: write
+  contents: write
+
+jobs:
+  onboarding:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: postman-cs/postman-api-onboarding-action@v0
+        with:
+          project-name: ${{ github.event.inputs.project_name }}
+          domain: payments
+          domain-code: PAY
+          spec-url: ${{ github.event.inputs.spec_url }}
+          environments-json: '["prod","stage"]'
+          env-runtime-urls-json: '{"prod":"https://api.payments.example.com","stage":"https://stage.payments.example.com"}'
+          postman-api-key: ${{ secrets.POSTMAN_API_KEY }}
+          postman-access-token: ${{ secrets.POSTMAN_ACCESS_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
